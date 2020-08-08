@@ -1,0 +1,16 @@
+{
+  "recommendations": [
+    "2gua.rainbow-brackets",
+    "christian-kohler.npm-intellisense",
+    "dbaeumer.vscode-eslint",
+    "editorconfig.editorconfig",
+    "ionutvmi.path-autocomplete",
+    "leizongmin.node-module-intellisense",
+    "mike-co.import-sorter",
+    "oderwat.indent-rainbow",
+    "richie5um2.vscode-sort-json",
+    "spywhere.guides",
+    "vincaslt.highlight-matching-tag",
+    "wayou.vscode-todo-highlight"
+  ]
+}
