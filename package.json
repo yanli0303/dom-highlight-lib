@@ -17,8 +17,7 @@
     "prepare": "tsdx build",
     "start": "tsdx watch"
   },
-  "dependencies": {
-  },
+  "dependencies": {},
   "devDependencies": {
     "husky": "^4.2.5",
     "tsdx": "^0.13.2",
