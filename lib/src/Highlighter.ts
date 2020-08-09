@@ -7,7 +7,7 @@ export class Highlighter {
 
   constructor(
     readonly getTextNodes: () => Node[],
-    readonly match: (nodes: Node[]) => Promise<Alert[][]>,
+    readonly match: (paragraphs: string[]) => Promise<Alert[][]>,
     readonly minBatchTextLength: number = 1000
   ) {}
 
@@ -24,7 +24,7 @@ export class Highlighter {
       batch.push(node);
       batchTextLength += (node.nodeValue || '').length;
       if (i === l - 1 || batchTextLength > this.minBatchTextLength) {
-        const alertGroups = await this.match(batch);
+        const alertGroups = await this.match(batch.map(n => n.nodeValue || ''));
         batch.forEach((n, i) => {
           this.matches.push({
             node: n,

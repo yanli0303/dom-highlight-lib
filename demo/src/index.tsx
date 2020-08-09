@@ -11,9 +11,8 @@ const radomColor = () => {
 };
 
 let id = 0;
-start(function(nodes: Node[]) {
+start(function(paragraphs: string[]) {
   const regex = /\w+/gm;
-  const texts = nodes.map(node => node.nodeValue || '');
   return new Promise(function(resolve, reject) {
     const match = (text: string) => {
       const matches = [];
@@ -34,7 +33,7 @@ start(function(nodes: Node[]) {
 
     setTimeout(() => {
       try {
-        const result = texts.map(match);
+        const result = paragraphs.map(match);
         resolve(result);
       } catch (e) {
         reject(e);
