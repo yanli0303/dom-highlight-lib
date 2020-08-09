@@ -6,7 +6,7 @@ import { Highlights } from './Highlights';
 import { getTextNodes } from './utils';
 
 export const start = (
-  match: (paragraphs: string[]) => Promise<Alert[][]>,
+  match: (paragraphs: string[]) => Promise<Token[][]>,
   minBatchTextLength: number = 1000
 ) => {
   const highlighter = new Highlighter(getTextNodes, match, minBatchTextLength);

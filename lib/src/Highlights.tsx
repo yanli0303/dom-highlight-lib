@@ -6,7 +6,6 @@ import { Highlighter } from './Highlighter';
 export const Highlights = ({ highlighter }: { highlighter: Highlighter }) => {
   const [count, setCount] = useState(0);
   useEffect(() => {
-    // TODO: mutation observer, re-scan on mutations.
     highlighter.scan().then(() => setCount(v => v + 1));
 
     const update = throttle(() => {

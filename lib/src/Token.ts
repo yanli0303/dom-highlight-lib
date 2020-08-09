@@ -1,7 +1,7 @@
 /**
  * Represents an underline item.
  */
-interface Alert {
+interface Token {
   /**
    * The unique ID.
    */

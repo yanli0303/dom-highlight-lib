@@ -1,13 +1,13 @@
 export class Highlighter {
   matches: {
     node: Node;
-    alerts: Alert[];
+    alerts: Token[];
     ranges: Range[];
   }[] = [];
 
   constructor(
     readonly getTextNodes: () => Node[],
-    readonly match: (paragraphs: string[]) => Promise<Alert[][]>,
+    readonly match: (paragraphs: string[]) => Promise<Token[][]>,
     readonly minBatchTextLength: number = 1000
   ) {}
 
