@@ -1,0 +1,40 @@
+{
+  "name": "dom-highlighter",
+  "version": "0.1.0",
+  "description": "Highlight tokens on the DOM like the Grammarly.",
+  "repository": "https://github.com/yanli0303/dom-highlighter.git",
+  "author": "Yan Li",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "module": "dist/dom-highlighter.esm.js",
+  "typings": "dist/index.d.ts",
+  "scripts": {
+    "lint": "tsdx lint src",
+    "pretest": "yarn lint",
+    "test": "tsdx test --coverage",
+    "build": "tsdx build",
+    "prepare": "tsdx build",
+    "start": "tsdx watch"
+  },
+  "dependencies": {
+    "lodash": "^4.17.19",
+    "lodash-es": "^4.17.15",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1"
+  },
+  "devDependencies": {
+    "@types/lodash": "^4.14.159",
+    "@types/lodash-es": "^4.17.3",
+    "@types/react": "^16.9.45",
+    "@types/react-dom": "^16.9.8",
+    "tsdx": "^0.13.2",
+    "tslib": "^2.0.0",
+    "typescript": "^3.9.5"
+  },
+  "engines": {
+    "node": ">=12"
+  },
+  "files": [
+    "dist"
+  ]
+}

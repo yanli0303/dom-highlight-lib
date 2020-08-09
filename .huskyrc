@@ -1,5 +1,5 @@
 {
   "hooks": {
-    "pre-commit": "tsdx lint src"
+    "pre-commit": "tsdx lint lib"
   }
 }

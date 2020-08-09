@@ -1,0 +1,41 @@
+a {
+  text-decoration: none;
+}
+
+span {
+  margin-right: 5px;
+  display: inline-block;
+  word-break: break-all;
+}
+
+textarea {
+  word-break: break-all;
+  width: 50em;
+  height: 15em;
+}
+
+.dh-underline {
+  z-index: 999;
+  position: fixed;
+}
+
+.dh-underline > div {
+  z-index: 1000;
+  display: none;
+  position: absolute;
+  top: 1;
+  left: 100%;
+  border-radius: 8px 8px;
+  background-color: #fff;
+  width: 362px;
+  box-shadow: 0 2px 15px 0 rgba(68, 70, 73, 0.2);
+  padding: 10px;
+}
+
+.dh-underline:hover {
+  opacity: 1;
+}
+
+.dh-underline:hover > div {
+  display: block;
+}
