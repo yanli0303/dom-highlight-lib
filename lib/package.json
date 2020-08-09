@@ -12,13 +12,14 @@
   "module": "dist/dom-highlight-lib.esm.js",
   "typings": "dist/index.d.ts",
   "scripts": {
+    "postinstall": "yarn build",
     "lint": "tsdx lint src",
     "pretest": "yarn lint",
     "test": "tsdx test --coverage",
-    "prebuild": "tsdx test",
+    "prebuild": "yarn test",
     "build": "tsdx build",
-    "prepare": "tsdx build",
-    "start": "tsdx watch"
+    "start": "tsdx watch",
+    "prepublishOnly": "yarn build"
   },
   "dependencies": {
     "lodash": "^4.17.19",
