@@ -1,7 +1,7 @@
 /**
  * Represents an underline item.
  */
-export interface Alert {
+interface Alert {
   /**
    * The unique ID.
    */

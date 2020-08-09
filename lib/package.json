@@ -12,7 +12,6 @@
   "module": "dist/dom-highlight-lib.esm.js",
   "typings": "dist/index.d.ts",
   "scripts": {
-    "postinstall": "yarn build",
     "lint": "tsdx lint src",
     "pretest": "yarn lint",
     "test": "tsdx test --coverage",

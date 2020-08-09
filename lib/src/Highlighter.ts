@@ -1,5 +1,3 @@
-import { Alert } from './Alert';
-
 export class Highlighter {
   matches: {
     node: Node;
