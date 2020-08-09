@@ -1,6 +1,6 @@
 import './index.css';
 
-import { start } from 'dom-highlighter';
+import { start } from 'dom-highlight-lib';
 import React from 'react';
 import { render } from 'react-dom';
 

@@ -19,9 +19,9 @@ export const Highlights = ({ highlighter }: { highlighter: Highlighter }) => {
     window.addEventListener('resize', update);
   }, [highlighter, setCount]);
 
+  console.log(`Rendering highlights...#${count}`);
   return (
     <div>
-      <strong>Count: {count}</strong>
       {highlighter.matches
         .map(m =>
           m.ranges.filter(Boolean).map((r, index) => {

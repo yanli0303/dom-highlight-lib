@@ -7,6 +7,9 @@ span {
   display: inline-block;
   word-break: break-all;
 }
+li {
+  word-break: break-all;
+}
 
 textarea {
   word-break: break-all;
@@ -14,17 +17,19 @@ textarea {
   height: 15em;
 }
 
+input[type=text] {
+  padding: 5px 10px;
+}
+
 .dh-underline {
-  z-index: 999;
   position: fixed;
 }
 
 .dh-underline > div {
-  z-index: 1000;
   display: none;
   position: absolute;
-  top: 1;
-  left: 100%;
+  top: 100%;
+  left: 0;
   border-radius: 8px 8px;
   background-color: #fff;
   width: 362px;
