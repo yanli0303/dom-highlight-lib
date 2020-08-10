@@ -95,3 +95,8 @@ npm install --save dom-highlight-lib
     ```
 
     > The highlighter now scans and monitor changes (`scroll`, `resize`, and `MutationObserver`) on the web page, and update highlights when necessary.
+
+## TODO
+
+- `textarea` and `input` controls are not supported because `Range.getClientRects()` returns empty list.
+- Because the `match` function is asynchronous, it possible for the highlighter to run into an inconsistent state when DOM changes frequently.
