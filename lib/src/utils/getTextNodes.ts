@@ -1,5 +1,5 @@
 import { isElementVisible } from './isElementVisible';
-import { isRectIntersectViewport } from './isRectIntersectViewport';
+import { isRectPartiallyVisible } from './isRectPartiallyVisible';
 import { trimInvisibleChars as trim } from './trimInvisibleChars';
 
 /**
@@ -38,7 +38,7 @@ export const getTextNodes = (
         continue;
       }
 
-      if (!isRectIntersectViewport(parentElement.getBoundingClientRect())) {
+      if (!isRectPartiallyVisible(parentElement.getBoundingClientRect())) {
         continue;
       }
     }

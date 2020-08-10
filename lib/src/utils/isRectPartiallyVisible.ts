@@ -4,7 +4,7 @@
  * @returns Returns `true` if any pixel in the DOMRect is visible on the screen,
  * even it is under the scrollbars; otherwise `false`;
  */
-export const isRectIntersectViewport = ({
+export const isRectPartiallyVisible = ({
   left,
   right,
   top,

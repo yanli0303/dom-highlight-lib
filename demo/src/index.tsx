@@ -11,35 +11,39 @@ const radomColor = () => {
 };
 
 let id = 0;
-start(function(paragraphs: string[]) {
-  const regex = /\w+/gm;
-  return new Promise(function(resolve, reject) {
-    const match = (text: string) => {
-      const matches = [];
-      let m = regex.exec(text);
-      while (m !== null) {
-        matches.push({
-          id: id.toString(),
-          color: radomColor(),
-          start: m.index,
-          end: m.index + m[0].length,
-          keyword: m[0],
-        });
-        id += 1;
-        m = regex.exec(text);
-      }
-      return matches;
-    };
+start(
+  function(paragraphs: string[]) {
+    const regex = /\w+/gm;
+    return new Promise(function(resolve, reject) {
+      const match = (text: string) => {
+        const matches = [];
+        let m = regex.exec(text);
+        while (m !== null) {
+          matches.push({
+            id: id.toString(),
+            color: radomColor(),
+            start: m.index,
+            end: m.index + m[0].length,
+            keyword: m[0],
+          });
+          id += 1;
+          m = regex.exec(text);
+        }
+        return matches;
+      };
 
-    setTimeout(() => {
-      try {
-        const result = paragraphs.map(match);
-        resolve(result);
-      } catch (e) {
-        reject(e);
-      }
-    }, 5);
-  });
-}, 20);
+      setTimeout(() => {
+        try {
+          const result = paragraphs.map(match);
+          resolve(result);
+        } catch (e) {
+          reject(e);
+        }
+      }, 5);
+    });
+  },
+  20,
+  'dh-underline'
+);
 
 render(<div />, document.getElementById('root'));

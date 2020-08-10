@@ -7,7 +7,7 @@
  * - Alternatively, if not considering `position: fixed`, use `e.offsetParent !== null`. See
  *   https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/offsetParent
  * @param e The HTMLElement to test.
- * @returns Returns `true` if the HTMLElement is visible as defined by CSS rules;
+ * @returns Returns `true` if the HTMLElement is visible as defined by the CSS rules;
  * otherwise `false`.
  */
 export const isElementVisible = (e: HTMLElement) =>
