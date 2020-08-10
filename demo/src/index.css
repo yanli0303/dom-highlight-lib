@@ -33,7 +33,7 @@ input[type=text] {
 
 .token-view {
   background-color: #fff;
-  border-radius: 8px 8px;
+  border-radius: 8px;
   box-shadow: 0 2px 15px 0 rgba(68, 70, 73, 0.2);
   color: #fff;
   padding: 10px;

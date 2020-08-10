@@ -17,7 +17,7 @@ let id = 0;
 const regex = /\w+/gm;
 const match = (paragraphs: string[]) =>
   new Promise<Token[][]>(function(resolve, reject) {
-    const match = (text: string) => {
+    const tokenize = (text: string) => {
       const tokens: Token[] = [];
       let m = regex.exec(text);
       while (m !== null) {
@@ -36,7 +36,7 @@ const match = (paragraphs: string[]) =>
 
     setTimeout(() => {
       try {
-        const result = paragraphs.map(match);
+        const result = paragraphs.map(tokenize);
         resolve(result);
       } catch (e) {
         reject(e);
