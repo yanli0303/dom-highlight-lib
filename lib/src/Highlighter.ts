@@ -1,5 +1,8 @@
 import stringHash from 'string-hash';
 
+import { Match } from './Match';
+import { Token } from './Token';
+
 export class Highlighter {
   matches: Match[] = [];
 

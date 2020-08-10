@@ -1,7 +1,7 @@
 /**
  * Represents an underline item.
  */
-interface Token {
+export interface Token {
   /**
    * The unique ID.
    */

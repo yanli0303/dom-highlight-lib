@@ -3,6 +3,7 @@ import { render } from 'react-dom';
 
 import { Highlighter } from './Highlighter';
 import { Highlights } from './Highlights';
+import { Token } from './Token';
 import { getTextNodes } from './utils';
 
 /**
@@ -19,6 +20,8 @@ import { getTextNodes } from './utils';
  */
 export const start = (
   match: (paragraphs: string[]) => Promise<Token[][]>,
+  showToken: (token: Token, rect: DOMRect, event: Event) => void,
+  hideToken: (token: Token, rect: DOMRect, event: Event) => void,
   minBatchTextLength: number = 1000,
   className: string = '',
   throttleUpdates: number = 500
@@ -33,6 +36,8 @@ export const start = (
       highlighter={highlighter}
       throttleUpdates={throttleUpdates}
       className={className}
+      onMouseEnterItem={showToken}
+      onMouseLeaveItem={hideToken}
     />,
     highlights
   );

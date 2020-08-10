@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 
 import { Highlight } from './Highlight';
 import { Highlighter } from './Highlighter';
+import { Token } from './Token';
 
 /**
  * `Highlights` properties.
@@ -22,6 +23,9 @@ interface HighlightsProps {
    * The CSS class name for the highlights container.
    */
   className: string;
+
+  onMouseEnterItem: (token: Token, rect: DOMRect, event: Event) => void;
+  onMouseLeaveItem: (token: Token, rect: DOMRect, event: Event) => void;
 }
 
 const SCROLL = 'scroll' as const;
@@ -58,10 +62,16 @@ export const Highlights = (props: HighlightsProps) => {
     <React.Fragment>
       {props.highlighter.matches
         .map(m =>
-          m.ranges.filter(Boolean).map((r, index) => {
-            const token = m.tokens[index];
-            return Array.from(r.getClientRects()).map((rect, index) => (
-              <Highlight key={token.id + index} token={token} rect={rect} />
+          m.ranges.filter(Boolean).map((r, ri) => {
+            const token = m.tokens[ri];
+            return Array.from(r.getClientRects()).map((rect, ri) => (
+              <Highlight
+                key={token.id + ri}
+                token={token}
+                rect={rect}
+                onMouseEnter={props.onMouseEnterItem}
+                onMouseLeave={props.onMouseLeaveItem}
+              />
             ));
           })
         )

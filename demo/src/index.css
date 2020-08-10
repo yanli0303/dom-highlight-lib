@@ -25,25 +25,19 @@ input[type=text] {
   position: fixed;
 }
 
-.dh-underline > div > div {
-  display: none;
-  position: absolute;
-  top: 100%;
-  left: 0;
-  border-radius: 8px 8px;
-  background-color: #fff;
-  width: 362px;
-  box-shadow: 0 2px 15px 0 rgba(68, 70, 73, 0.2);
-  padding: 10px;
-  color: #fff;
-}
-
 .dh-underline > div:hover {
   opacity: 1;
   cursor: pointer;
   background-color: rgba(255, 193, 7, 0.5);
 }
 
-.dh-underline > div:hover > div {
-  display: block;
+.token-view {
+  background-color: #fff;
+  border-radius: 8px 8px;
+  box-shadow: 0 2px 15px 0 rgba(68, 70, 73, 0.2);
+  color: #fff;
+  padding: 10px;
+  position: absolute;
+  width: 362px;
+  z-index: 2147483647;
 }

@@ -1,7 +1,9 @@
+import { Token } from './Token';
+
 /**
  * The data structure regards a single text node.
  */
-interface Match {
+export interface Match {
   /**
    * Text node.
    * TODO: convert to weak ref.
