@@ -1,6 +1,6 @@
 {
   "name": "dom-highlight-lib",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Highlight tokens on the DOM like the Grammarly.",
   "repository": {
     "type": "git",

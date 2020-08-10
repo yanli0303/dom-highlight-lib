@@ -31,6 +31,7 @@ interface HighlightsProps {
 const SCROLL = 'scroll' as const;
 const RESIZE = 'resize' as const;
 let UPDATE_HANDLER: any = null;
+let mutationObserver: MutationObserver | null = null;
 
 const deleteEventListeners = () => {
   if (UPDATE_HANDLER) {
@@ -48,11 +49,19 @@ export const Highlights = (props: HighlightsProps) => {
 
     const update = () =>
       props.highlighter.scan().then(() => setCount(v => v + 1));
+    const uu = throttle(update, props.throttleUpdates);
+    UPDATE_HANDLER = uu;
+
+    mutationObserver = new MutationObserver(uu);
+    mutationObserver.observe(document.documentElement, {
+      attributes: true,
+      childList: true,
+      subtree: true,
+    });
 
     update();
-    UPDATE_HANDLER = throttle(update, props.throttleUpdates);
-    document.addEventListener('scroll', UPDATE_HANDLER);
-    window.addEventListener('resize', UPDATE_HANDLER);
+    document.addEventListener('scroll', uu);
+    window.addEventListener('resize', uu);
   }, [props.highlighter, props.throttleUpdates, setCount]);
 
   console.log(`Rendering highlights...#${count}`);
@@ -61,12 +70,12 @@ export const Highlights = (props: HighlightsProps) => {
   return (
     <React.Fragment>
       {props.highlighter.matches
-        .map(m =>
+        .map((m, mi) =>
           m.ranges.filter(Boolean).map((r, ri) => {
             const token = m.tokens[ri];
             return Array.from(r.getClientRects()).map((rect, ri) => (
               <Highlight
-                key={token.id + ri}
+                key={[mi, token.id, ri].join('-')}
                 token={token}
                 rect={rect}
                 onMouseEnter={props.onMouseEnterItem}

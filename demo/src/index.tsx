@@ -4,10 +4,8 @@ import { start, Token } from 'dom-highlight-lib';
 import React, { useEffect, useState } from 'react';
 import { render } from 'react-dom';
 
-interface TokenView {
-  token: Token;
-  rect: DOMRect;
-}
+import { Card } from './Card';
+import { TokenView } from './TokenView';
 
 const radomColor = () => {
   const colors = ['red', 'pink', 'orange', 'purple', 'blue', 'black', 'green'];
@@ -47,7 +45,7 @@ const match = (paragraphs: string[]) =>
   });
 
 const App = () => {
-  const [data, setData] = useState<TokenView | null>(null);
+  const [data, setData] = useState<Card | null>(null);
 
   useEffect(() => {
     const showToken = (token: Token, rect: DOMRect) => {
@@ -57,24 +55,19 @@ const App = () => {
     start(match, showToken, hideToken, 20, 'dh-underline', 500);
   }, [setData]);
 
-  if (!data) {
-    return null;
-  }
+  const handleNewDOMNode = () => {
+    const div = document.createElement('div');
+    div.innerHTML = 'New DIV element';
+    document.body.appendChild(div);
+  };
 
   return (
-    <div
-      className="token-view"
-      style={{
-        background: data.token.color,
-        top: data.rect.bottom,
-        left: data.rect.left,
-      }}
-    >
-      <ul>
-        <li>Card ID: ${data.token.id}</li>
-        <li>Title: ${data.token.keyword}</li>
-      </ul>
-    </div>
+    <React.Fragment>
+      <button onClick={handleNewDOMNode} style={{ padding: '5px 1em' }}>
+        Add New DOM Node, trigger mutation observer
+      </button>
+      <TokenView data={data} />
+    </React.Fragment>
   );
 };
 
