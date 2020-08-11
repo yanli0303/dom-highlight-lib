@@ -75,6 +75,10 @@ npm install --save dom-highlight-lib
     ```
 
 3. Optionally, provide below parameters:
+   - `selectors`: specify CSS selector string of the root nodes to match. Defaults to the `document.documentElement`.
+   - `ignoreInvisibleNodes`: whether ignores invisible nodes. Defaults to `true`.
+   - `minTextLength`: Ignore text nodes whose text length is less than specified value. Defaults to `3`.
+   - `trimInvisibleChars`: Whether ignores the leading and trailing invisible chars before counting the text length. Defaults to `true`.
    - `minBatchTextLength`: controls how often to invoke the `match` function according to the total number of characters in the strings. Defaults to `1000`.
    - `className`: the CSS class name for the highlights container. Defaults to empty string.
    - `throttleUpdates`: Throttle highlight updates, update at most once every specified milliseconds. Defaults to `500`ms.
@@ -84,14 +88,18 @@ npm install --save dom-highlight-lib
     ```js
     // for example, on a web page
     const highlighter = require('dom-highlight-lib');
-    highlighter.start(
+    highlighter.start({
       match,
       showToken,
       hideToken,
-      1000, // minBatchTextLength
-      'highlights', // className
-      500 // throttleUpdates
-    );
+      selectors: '',
+      ignoreInvisibleNodes: true,
+      minTextLength: 3,
+      trimInvisibleChars: true,
+      minBatchTextLength: 1000,
+      className: '',
+      throttleUpdates: 500
+    });
     ```
 
     > The highlighter now scans and monitor changes (`scroll`, `resize`, and `MutationObserver`) on the web page, and update highlights when necessary.

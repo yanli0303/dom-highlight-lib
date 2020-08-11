@@ -1,3 +1,4 @@
+/* eslint-disable no-irregular-whitespace */
 import { trimInvisibleChars } from './trimInvisibleChars';
 
 it('single line', () => {

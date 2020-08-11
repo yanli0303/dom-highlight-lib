@@ -52,7 +52,13 @@ const App = () => {
       setData({ token, rect });
     };
     const hideToken = () => setData(null);
-    start(match, showToken, hideToken, 20, 'dh-underline', 500);
+    start({
+      match,
+      showToken,
+      hideToken,
+      minBatchTextLength: 20,
+      className: 'dh-underline',
+    });
   }, [setData]);
 
   const handleNewDOMNode = () => {

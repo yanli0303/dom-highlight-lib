@@ -19,11 +19,6 @@ interface HighlightsProps {
    */
   throttleUpdates: number;
 
-  /**
-   * The CSS class name for the highlights container.
-   */
-  className: string;
-
   onMouseEnterItem: (token: Token, rect: DOMRect, event: Event) => void;
   onMouseLeaveItem: (token: Token, rect: DOMRect, event: Event) => void;
 }
@@ -41,15 +36,19 @@ const deleteEventListeners = () => {
   }
 };
 
-export const Highlights = (props: HighlightsProps) => {
+export const Highlights = ({
+  highlighter,
+  throttleUpdates,
+  onMouseEnterItem,
+  onMouseLeaveItem,
+}: HighlightsProps) => {
   const [count, setCount] = useState(0);
 
   useEffect(() => {
     deleteEventListeners();
 
-    const update = () =>
-      props.highlighter.scan().then(() => setCount(v => v + 1));
-    const uu = throttle(update, props.throttleUpdates);
+    const update = () => highlighter.scan().then(() => setCount(v => v + 1));
+    const uu = throttle(update, throttleUpdates);
     UPDATE_HANDLER = uu;
 
     mutationObserver = new MutationObserver(uu);
@@ -62,14 +61,17 @@ export const Highlights = (props: HighlightsProps) => {
     update();
     document.addEventListener('scroll', uu);
     window.addEventListener('resize', uu);
-  }, [props.highlighter, props.throttleUpdates, setCount]);
+  }, [highlighter, throttleUpdates, setCount]);
 
-  console.log(`Rendering highlights...#${count}`);
+  if (process.env.NODE_ENV !== 'production') {
+    // eslint-disable-next-line no-console
+    console.log(`Rendering highlights...#${count}`);
+  }
 
-  props.highlighter.updateHighlights();
+  highlighter.updateHighlights();
   return (
-    <React.Fragment>
-      {props.highlighter.matches
+    <>
+      {highlighter.matches
         .map((m, mi) =>
           m.ranges.filter(Boolean).map((r, ri) => {
             const token = m.tokens[ri];
@@ -78,13 +80,13 @@ export const Highlights = (props: HighlightsProps) => {
                 key={[mi, token.id, ri].join('-')}
                 token={token}
                 rect={rect}
-                onMouseEnter={props.onMouseEnterItem}
-                onMouseLeave={props.onMouseLeaveItem}
+                onMouseEnter={onMouseEnterItem}
+                onMouseLeave={onMouseLeaveItem}
               />
             ));
           })
         )
         .flat(3)}
-    </React.Fragment>
+    </>
   );
 };

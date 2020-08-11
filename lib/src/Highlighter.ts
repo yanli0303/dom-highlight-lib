@@ -1,3 +1,5 @@
+/* eslint-disable no-await-in-loop,no-restricted-syntax */
+
 import stringHash from 'string-hash';
 
 import { Match } from './Match';
@@ -62,10 +64,9 @@ export class Highlighter {
         const tokenGroups = await this.match(
           batch.map(n => n.node.nodeValue || '')
         );
-        batch.forEach((m, i) => {
-          m.tokens = tokenGroups[i];
-        });
-
+        for (let j = 0; j < batch.length; j += 1) {
+          batch[j].tokens = tokenGroups[j];
+        }
         batch = [];
         batchTextLength = 0;
       }
@@ -78,24 +79,28 @@ export class Highlighter {
     const nodes = await this.getTextNodes();
     const { unchanged, changedAndNew } = this.groupNodes(nodes);
 
-    console.log(
-      `Highlighter.scan: unchanged=${unchanged.length}, changed and new: ${changedAndNew.length}`
-    );
+    if (process.env.NODE_ENV !== 'production') {
+      // eslint-disable-next-line no-console
+      console.log(
+        `Highlighter.scan: unchanged=${unchanged.length}, changed and new: ${changedAndNew.length}`
+      );
+    }
 
     await this.setTokens(changedAndNew);
     this.matches = [...unchanged, ...changedAndNew];
   }
 
   updateHighlights() {
+    const makeRange = (m: Match, t: Token) => {
+      const r = document.createRange();
+      r.setStart(m.node, t.start);
+      r.setEnd(m.node, t.end);
+      return r;
+    };
+
     for (const m of this.matches) {
       m.ranges.forEach(r => r.detach());
-
-      m.ranges = m.tokens.map(a => {
-        const r = document.createRange();
-        r.setStart(m.node, a.start);
-        r.setEnd(m.node, a.end);
-        return r;
-      });
+      m.ranges = m.tokens.map(t => makeRange(m, t));
     }
   }
 }
