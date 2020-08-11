@@ -21,8 +21,9 @@ export const Highlight = ({
       top: rect.top,
       left: rect.left,
       width: rect.width,
-      height: rect.height - 2,
+      height: rect.height - 1,
       borderBottom: `2px solid ${token.color}`,
+      zIndex: 2147483647,
     }}
   />
 );

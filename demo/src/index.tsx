@@ -14,9 +14,19 @@ const radomColor = () => {
 };
 
 let id = 0;
-const regex = /\w+/gm;
-const match = (paragraphs: string[]) =>
-  new Promise<Token[][]>(function(resolve, reject) {
+
+const getRegExp = () => {
+  const str = localStorage.getItem('yali-dh-regex');
+  if (str) {
+    return new RegExp(str, 'mg');
+  }
+
+  return /\w+/gm;
+};
+
+const match = (paragraphs: string[]) => {
+  const regex = getRegExp();
+  return new Promise<Token[][]>(function(resolve, reject) {
     const tokenize = (text: string) => {
       const tokens: Token[] = [];
       let m = regex.exec(text);
@@ -43,6 +53,7 @@ const match = (paragraphs: string[]) =>
       }
     }, 5);
   });
+};
 
 const App = () => {
   const [data, setData] = useState<Card | null>(null);
@@ -56,7 +67,6 @@ const App = () => {
       match,
       showToken,
       hideToken,
-      minBatchTextLength: 20,
       className: 'dh-underline',
     });
   }, [setData]);
@@ -77,4 +87,12 @@ const App = () => {
   );
 };
 
-render(<App />, document.getElementById('root'));
+// const isEnabled = localStorage.getItem('yali-dh-enabled');
+// if (isEnabled === 'true') {
+const root = document.createElement('div');
+root.style.margin = 'margin: 1em auto';
+document.body.appendChild(root);
+render(<App />, root);
+// } else {
+//   console.log('Highlighter is disabled.');
+// }

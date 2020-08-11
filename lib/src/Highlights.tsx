@@ -47,26 +47,33 @@ export const Highlights = ({
   useEffect(() => {
     deleteEventListeners();
 
-    const update = () => highlighter.scan().then(() => setCount(v => v + 1));
-    const uu = throttle(update, throttleUpdates);
+    const updateHighlights = (e: any) => {
+      console.log(
+        `Re-scan triggered by ${typeof e === 'object' && e.type ? e.type : e}`
+      );
+      highlighter.scan().then(() => setCount(v => v + 1));
+    };
+    const uu = throttle(updateHighlights, throttleUpdates);
+
     UPDATE_HANDLER = uu;
 
-    mutationObserver = new MutationObserver(uu);
+    mutationObserver = new MutationObserver((...args: any[]) => {
+      console.log(`DOM change:`, args);
+      uu('MutationObserver');
+    });
     mutationObserver.observe(document.documentElement, {
-      attributes: true,
+      attributes: false,
       childList: true,
       subtree: true,
     });
 
-    update();
+    updateHighlights('page load');
     document.addEventListener('scroll', uu);
     window.addEventListener('resize', uu);
   }, [highlighter, throttleUpdates, setCount]);
 
-  if (process.env.NODE_ENV !== 'production') {
-    // eslint-disable-next-line no-console
-    console.log(`Rendering highlights...#${count}`);
-  }
+  // eslint-disable-next-line no-console
+  console.log(`Rendering highlights...#${count}`);
 
   highlighter.updateHighlights();
   return (

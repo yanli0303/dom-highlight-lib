@@ -79,12 +79,10 @@ export class Highlighter {
     const nodes = await this.getTextNodes();
     const { unchanged, changedAndNew } = this.groupNodes(nodes);
 
-    if (process.env.NODE_ENV !== 'production') {
-      // eslint-disable-next-line no-console
-      console.log(
-        `Highlighter.scan: unchanged=${unchanged.length}, changed and new: ${changedAndNew.length}`
-      );
-    }
+    // eslint-disable-next-line no-console
+    console.log(
+      `Highlighter.scan: unchanged=${unchanged.length}, changed and new: ${changedAndNew.length}`
+    );
 
     await this.setTokens(changedAndNew);
     this.matches = [...unchanged, ...changedAndNew];
