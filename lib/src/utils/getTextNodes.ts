@@ -4,12 +4,17 @@ import { isElementVisible } from './isElementVisible';
 import { isRectPartiallyVisible } from './isRectPartiallyVisible';
 import { trimInvisibleChars as trim } from './trimInvisibleChars';
 
-const findAllTextNodes = (
-  root: Node,
-  ignoreInvisibleNodes: boolean,
-  trimInvisibleChars: boolean,
-  minTextLength: number
-) => {
+/**
+ * Gets all text nodes in the specified root node.
+ * @param param0 The text node filters.
+ * @returns An array of text nodes that satisfy given filters.
+ */
+export const getDescendantTextNodes = ({
+  root,
+  ignoreInvisibleNodes,
+  trimInvisibleChars,
+  minTextLength,
+}: DescendantTextNodeFilter) => {
   const walker = document.createTreeWalker(
     root,
     NodeFilter.SHOW_TEXT,
@@ -46,22 +51,14 @@ const findAllTextNodes = (
 
 /**
  * Gets all text nodes on the page.
- * @param selectors A string containing one or more selectors to match against.
- * This string must be a valid CSS selector string; if it's not, a SyntaxError
- * exception is thrown. Multiple selectors may be specified by separating
- * them using commas.
- * @param ignoreInvisibleNodes Exclude invisible text nodes.
- * @param trimInvisibleChars Whether to delete both leading and
- * trailing invisible characters before counting node text length.
- * @param minTextLength Exclude text nodes whose text length is less than give value.
- * @returns An array of text nodes that satisfy given conditions.
+ * @returns An array of text nodes that satisfy given filters.
  */
-export const getTextNodes = (
+export const getTextNodes = ({
   selectors = '',
   ignoreInvisibleNodes = true,
   trimInvisibleChars = true,
-  minTextLength = 3
-) => {
+  minTextLength = 3,
+}: TextNodeSelector) => {
   const docE = document.documentElement;
   const roots = selectors
     ? Array.from(docE.querySelectorAll(selectors))
@@ -69,12 +66,12 @@ export const getTextNodes = (
 
   return roots
     .map(root =>
-      findAllTextNodes(
+      getDescendantTextNodes({
         root,
         ignoreInvisibleNodes,
         trimInvisibleChars,
-        minTextLength
-      )
+        minTextLength,
+      })
     )
     .flat(2);
 };
