@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 
 import { Highlight } from './Highlight';
 import { Highlighter } from './Highlighter';
+import { makeMutationObserver } from './makeMutationObserver';
 import { Token } from './Token';
 
 /**
@@ -19,6 +20,11 @@ interface HighlightsProps {
    */
   throttleUpdates: number;
 
+  /**
+   * A selector or an array of `Node` that do nothing when they mutate.
+   */
+  ignoreMutations: (string | Node)[];
+
   onMouseEnterItem: (token: Token, rect: DOMRect, event: Event) => void;
   onMouseLeaveItem: (token: Token, rect: DOMRect, event: Event) => void;
 }
@@ -33,12 +39,14 @@ const deleteEventListeners = () => {
     document.removeEventListener(SCROLL, UPDATE_HANDLER);
     window.removeEventListener(RESIZE, UPDATE_HANDLER);
     UPDATE_HANDLER = null;
+    mutationObserver?.disconnect();
   }
 };
 
 export const Highlights = ({
   highlighter,
   throttleUpdates,
+  ignoreMutations,
   onMouseEnterItem,
   onMouseLeaveItem,
 }: HighlightsProps) => {
@@ -46,31 +54,34 @@ export const Highlights = ({
 
   useEffect(() => {
     deleteEventListeners();
+    const flush = () => setCount(v => v + 1);
 
-    const updateHighlights = (e: any) => {
-      console.log(
-        `Re-scan triggered by ${typeof e === 'object' && e.type ? e.type : e}`
-      );
-      highlighter.scan().then(() => setCount(v => v + 1));
+    const scan = (e: any) => {
+      console.log(`${typeof e === 'object' && e.type ? e.type : e}, scanning`);
+      highlighter.scan().then(flush);
     };
-    const uu = throttle(updateHighlights, throttleUpdates);
+    const uu = throttle(scan, throttleUpdates);
 
+    document.addEventListener('scroll', uu);
+    window.addEventListener('resize', uu);
     UPDATE_HANDLER = uu;
 
-    mutationObserver = new MutationObserver((...args: any[]) => {
-      console.log(`DOM change:`, args);
-      uu('MutationObserver');
-    });
-    mutationObserver.observe(document.documentElement, {
+    if (!mutationObserver) {
+      mutationObserver = makeMutationObserver(
+        highlighter,
+        flush,
+        ignoreMutations
+      );
+    }
+
+    mutationObserver?.observe(document.documentElement, {
       attributes: false,
       childList: true,
       subtree: true,
     });
 
-    updateHighlights('page load');
-    document.addEventListener('scroll', uu);
-    window.addEventListener('resize', uu);
-  }, [highlighter, throttleUpdates, setCount]);
+    scan('page load');
+  }, [highlighter, throttleUpdates, setCount, ignoreMutations]);
 
   // eslint-disable-next-line no-console
   console.log(`Rendering highlights...#${count}`);
@@ -78,22 +89,32 @@ export const Highlights = ({
   highlighter.updateHighlights();
   return (
     <>
-      {highlighter.matches
-        .map((m, mi) =>
-          m.ranges.filter(Boolean).map((r, ri) => {
-            const token = m.tokens[ri];
-            return Array.from(r.getClientRects()).map((rect, ri) => (
-              <Highlight
-                key={[mi, token.id, ri].join('-')}
-                token={token}
-                rect={rect}
-                onMouseEnter={onMouseEnterItem}
-                onMouseLeave={onMouseLeaveItem}
-              />
-            ));
-          })
+      {Array.from(highlighter.matches.values())
+        .map((match, matchIndex) =>
+          match.nodeRefs.map((ref, refIndex) =>
+            ref.ranges.filter(Boolean).map((range, rangeIndex) => {
+              const token = (match.tokens || [])[rangeIndex];
+              return Array.from(
+                range.getClientRects()
+              ).map((rect, rectIndex) => (
+                <Highlight
+                  key={[
+                    matchIndex,
+                    refIndex,
+                    token.id,
+                    rangeIndex,
+                    rectIndex,
+                  ].join('-')}
+                  token={token}
+                  rect={rect}
+                  onMouseEnter={onMouseEnterItem}
+                  onMouseLeave={onMouseLeaveItem}
+                />
+              ));
+            })
+          )
         )
-        .flat(3)}
+        .flat(4)}
     </>
   );
 };

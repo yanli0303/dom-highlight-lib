@@ -55,7 +55,7 @@ const match = (paragraphs: string[]) => {
   });
 };
 
-const App = () => {
+const App = ({ container }: { container: Node }) => {
   const [data, setData] = useState<Card | null>(null);
 
   useEffect(() => {
@@ -68,8 +68,9 @@ const App = () => {
       showToken,
       hideToken,
       className: 'dh-underline',
+      ignoreMutations: [container],
     });
-  }, [setData]);
+  }, [setData, container]);
 
   const handleNewDOMNode = () => {
     const div = document.createElement('div');
@@ -87,12 +88,7 @@ const App = () => {
   );
 };
 
-// const isEnabled = localStorage.getItem('yali-dh-enabled');
-// if (isEnabled === 'true') {
 const root = document.createElement('div');
 root.style.margin = 'margin: 1em auto';
 document.body.appendChild(root);
-render(<App />, root);
-// } else {
-//   console.log('Highlighter is disabled.');
-// }
+render(<App container={root} />, root);

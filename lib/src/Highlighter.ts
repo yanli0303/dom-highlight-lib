@@ -1,104 +1,192 @@
-/* eslint-disable no-await-in-loop,no-restricted-syntax */
-
+/* eslint-disable no-await-in-loop,no-restricted-syntax,no-console */
 import stringHash from 'string-hash';
 
-import { Match } from './Match';
+import { HighlighterConfig } from './HighlighterConfig';
+import { Match, NodeRef } from './Match';
 import { Token } from './Token';
+// prettier-ignore
+import {
+  getDescendantTextNodes, getTextNodes, isDescendant, testTextNode,
+} from './utils';
 
 export class Highlighter {
-  matches: Match[] = [];
-
-  constructor(
-    readonly getTextNodes: () => Node[],
-    readonly match: (paragraphs: string[]) => Promise<Token[][]>,
-    readonly minBatchTextLength: number = 1000
-  ) {}
-
   /**
-   * Split given nodes into two groups:
-   * - Unchanged: the nodes whose value unchanged since last scan.
-   * - Changed and new: the newly found and changed nodes.
-   * @param nodes The nodes to group.
+   * The current matches in a `Map`.
+   * - Key is the hash value of the node text content, different
+   * nodes with same text content share same key.
+   * - Value is an array of `Match` (different DOM nodes).
    */
-  private groupNodes(nodes: Node[]) {
-    const oldMatchMap = new Map<number, Match>();
-    this.matches.forEach(it => {
-      oldMatchMap.set(it.nodeValueHash, it);
-    });
+  matches: Map<number, Match> = new Map();
 
-    const unchanged: Match[] = [];
-    const changedAndNew: Match[] = [];
-    nodes.forEach(node => {
-      const nodeValue = node.nodeValue || '';
-      const nodeValueHash = stringHash(nodeValue);
-      const oldMatch = oldMatchMap.get(nodeValueHash);
-      const match: Match = {
-        node,
-        nodeValueHash,
-        tokens: oldMatch ? oldMatch.tokens : [],
-        ranges: [],
-      };
-      if (oldMatch) {
-        unchanged.push(match);
-      } else {
-        changedAndNew.push(match);
-      }
-    });
+  constructor(readonly config: HighlighterConfig) {}
 
-    return { unchanged, changedAndNew };
+  detachRanges() {
+    this.matches.forEach(m =>
+      m.nodeRefs.forEach(n => n.ranges.forEach(r => r.detach))
+    );
   }
 
-  /**
-   * Perform `match` for every item and set `item.tokens`.
-   * @param items The items to update tokens.
-   */
-  async setTokens(items: Match[]) {
-    const l = items.length;
-    let batch: Match[] = [];
-    let batchTextLength = 0;
-    for (let i = 0; i < l; i += 1) {
-      const match = items[i];
-      batch.push(match);
-      batchTextLength += (match.node.nodeValue || '').length;
-      if (i === l - 1 || batchTextLength > this.minBatchTextLength) {
-        const tokenGroups = await this.match(
-          batch.map(n => n.node.nodeValue || '')
-        );
-        for (let j = 0; j < batch.length; j += 1) {
-          batch[j].tokens = tokenGroups[j];
-        }
-        batch = [];
-        batchTextLength = 0;
+  async setTokens(matches: Match[]) {
+    const nonEmptyMatches: Match[] = [];
+    matches.forEach(m => {
+      if (m.nodeRefs.length === 0) {
+        m.tokens = [];
+      } else {
+        nonEmptyMatches.push(m);
       }
+    });
+
+    const tokenGroups = await this.config.match(
+      nonEmptyMatches.map(m => m.nodeRefs[0].node.nodeValue || '')
+    );
+    for (let i = 0; i < nonEmptyMatches.length; i += 1) {
+      nonEmptyMatches[i].tokens = tokenGroups[i];
     }
   }
 
-  async scan() {
-    this.matches.forEach(m => m.ranges.forEach(r => r.detach()));
+  setNodes(textNodes: Node[]): Promise<void> {
+    this.detachRanges();
+    const oldMatches = this.matches;
+    const newMatches: Map<number, Match> = new Map();
+    textNodes.forEach(node => {
+      const nodeValueHash = stringHash(node.nodeValue || '');
+      const nodeRef: NodeRef = { node, ranges: [] };
 
-    const nodes = await this.getTextNodes();
-    const { unchanged, changedAndNew } = this.groupNodes(nodes);
+      const oldMatch = oldMatches.get(nodeValueHash);
+      const newMatch = newMatches.get(nodeValueHash);
+      if (newMatch) {
+        newMatch.nodeRefs.push(nodeRef);
+      } else {
+        newMatches.set(nodeValueHash, {
+          tokens: oldMatch?.tokens,
+          nodeRefs: [nodeRef],
+        });
+      }
+    });
 
-    // eslint-disable-next-line no-console
-    console.log(
-      `Highlighter.scan: unchanged=${unchanged.length}, changed and new: ${changedAndNew.length}`
-    );
+    this.matches = newMatches;
+    return this.match();
+  }
 
-    await this.setTokens(changedAndNew);
-    this.matches = [...unchanged, ...changedAndNew];
+  /**
+   * Find tokens for matches.
+   * @param forceUpdate If `false`, skip the matches that have tokens;
+   * otherwise ignore existing tokens.
+   */
+  match(forceUpdate: boolean = false): Promise<void> {
+    const promises: Promise<void>[] = [];
+    let matches = Array.from(this.matches.values());
+    if (!forceUpdate) {
+      matches = matches.filter(m => !m.tokens);
+    }
+
+    const { minBatchTextLength = 1000 } = this.config;
+    let batch: Match[] = [];
+    let batchTextLength = 0;
+    for (const match of matches) {
+      if (match.nodeRefs.length > 0) {
+        batch.push(match);
+        batchTextLength += (match.nodeRefs[0].node.nodeValue || '').length;
+        if (batchTextLength > minBatchTextLength) {
+          promises.push(this.setTokens(batch));
+          batch = [];
+          batchTextLength = 0;
+        }
+      }
+    }
+
+    if (batch.length > 0) {
+      promises.push(this.setTokens(batch));
+    }
+
+    return Promise.all(promises).then(() => {});
+  }
+
+  addNodes(rootNodes: Node[]): Promise<void> {
+    let numberOfNewNodes = 0;
+    rootNodes
+      .map(node =>
+        getDescendantTextNodes({
+          root: node,
+          ...this.config,
+        })
+      )
+      .flat(2)
+      .forEach(node => {
+        const nodeValueHash = stringHash(node.nodeValue || '');
+        const nodeRef: NodeRef = { node, ranges: [] };
+        const match = this.matches.get(nodeValueHash);
+        if (match) {
+          if (!match.nodeRefs.some(it => it.node === node)) {
+            match.nodeRefs.push(nodeRef);
+            numberOfNewNodes += 1;
+          }
+        } else {
+          this.matches.set(nodeValueHash, { nodeRefs: [nodeRef] });
+          numberOfNewNodes += 1;
+        }
+      });
+
+    console.log(`addNodes: found ${numberOfNewNodes} new text nodes`);
+    if (numberOfNewNodes > 0) {
+      return this.match();
+    }
+
+    return Promise.resolve();
+  }
+
+  removeNodes(rootNodes: Node[]) {
+    let numberOfRemovedNodes = 0;
+    const removedMatchKeys: number[] = [];
+    this.matches.forEach((match, key) => {
+      match.nodeRefs = match.nodeRefs.filter(ref => {
+        if (
+          testTextNode(ref.node, this.config) &&
+          !rootNodes.some(r => r === ref.node || isDescendant(r, ref.node))
+        ) {
+          return true;
+        }
+
+        numberOfRemovedNodes += 1;
+        ref.ranges.forEach(r => r.detach());
+        return false;
+      });
+
+      if (match.nodeRefs.length === 0) {
+        removedMatchKeys.push(key);
+      }
+    });
+
+    removedMatchKeys.forEach(key => {
+      this.matches.delete(key);
+    });
+
+    console.log(`removeNodes: removed ${numberOfRemovedNodes} text nodes`);
+  }
+
+  updateNodes(rootNodes: Node[]): Promise<void> {
+    this.removeNodes(rootNodes);
+    return this.addNodes(rootNodes);
+  }
+
+  scan(): Promise<void> {
+    const nodes = getTextNodes(this.config);
+    return this.setNodes(nodes);
   }
 
   updateHighlights() {
-    const makeRange = (m: Match, t: Token) => {
+    const makeRange = (ref: NodeRef, t: Token) => {
       const r = document.createRange();
-      r.setStart(m.node, t.start);
-      r.setEnd(m.node, t.end);
+      r.setStart(ref.node, t.start);
+      r.setEnd(ref.node, t.end);
       return r;
     };
 
-    for (const m of this.matches) {
-      m.ranges.forEach(r => r.detach());
-      m.ranges = m.tokens.map(t => makeRange(m, t));
-    }
+    this.matches.forEach(m =>
+      m.nodeRefs.forEach(ref => {
+        ref.ranges.forEach(r => r.detach());
+        ref.ranges = (m.tokens || []).map(t => makeRange(ref, t));
+      })
+    );
   }
 }

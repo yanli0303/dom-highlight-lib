@@ -2,17 +2,11 @@ import React from 'react';
 import { render } from 'react-dom';
 
 import { Highlighter } from './Highlighter';
+import { HighlighterConfig } from './HighlighterConfig';
 import { Highlights } from './Highlights';
 import { Token } from './Token';
-import { getTextNodes } from './utils';
 
-interface Options {
-  /**
-   * The asynchronous function that find tokens
-   * in give paragraphs.
-   */
-  match: (paragraphs: string[]) => Promise<Token[][]>;
-
+interface StartOptions {
   /**
    * Defines what to do when the user mouse hover on a token.
    * @param token The token.
@@ -32,46 +26,6 @@ interface Options {
   hideToken: (token: Token, rect: DOMRect, event: Event) => void;
 
   /**
-   * Specify CSS selector string of the root nodes to match.
-   * This string must be a valid CSS selector string; if it's not, a SyntaxError
-   * exception is thrown. Multiple selectors may be specified by separating
-   * them using commas.
-   *
-   * Defaults to the `document.documentElement`.
-   */
-  selectors?: string;
-
-  /**
-   * Whether ignores invisible nodes. Defaults to `true`.
-   * @remarks
-   * An HTML element is visible if both of below assertions are true:
-   * - The element is visible as defined by the CSS rules - it must
-   * has an `offsetParent`.
-   * - The element has intersection with the viewport - it is on the screen.
-   */
-  ignoreInvisibleNodes?: boolean;
-
-  /**
-   * Ignore text nodes whose text length is less than specified value.
-   * Defaults to `3`.
-   * @remarks
-   */
-  minTextLength?: number;
-
-  /**
-   * Whether ignores the leading and trailing invisible chars before
-   * counting the text length. Defaults to `true`.
-   */
-  trimInvisibleChars?: boolean;
-
-  /**
-   * Controls how often to invoke the
-   * `match` function according to the total number of characters
-   * in the paragraphs. Defaults to`1000`.
-   */
-  minBatchTextLength?: number;
-
-  /**
    * The CSS class name for the highlights container.
    * Defaults to empty string.
    */
@@ -82,50 +36,33 @@ interface Options {
    * Defaults to `500`.
    */
   throttleUpdates?: number;
+
+  /**
+   * A selector or an array of `Node` that do nothing when they mutate.
+   */
+  ignoreMutations: (string | Node)[];
 }
 
 /**
- * Start highlighter.
- *
- * @param selectors
- * @param minBatchTextLength
- * @param className The CSS class name for the highlights container.
- * @param throttleUpdates  Throttle updates,
- * update at most once every specified milliseconds.
+ * Initialize and start the highlighter.
  */
-export const start = ({
-  match,
-  showToken,
-  hideToken,
-  selectors = '',
-  ignoreInvisibleNodes = true,
-  minTextLength = 3,
-  trimInvisibleChars = true,
-  minBatchTextLength = 1000,
-  className = '',
-  throttleUpdates = 500,
-}: Options) => {
-  const findTextNodes = () =>
-    getTextNodes(
-      selectors,
-      ignoreInvisibleNodes,
-      trimInvisibleChars,
-      minTextLength
-    );
-  const highlighter = new Highlighter(findTextNodes, match, minBatchTextLength);
-
+export const start = (
+  options: StartOptions & HighlighterConfig & TextNodeSelector
+) => {
+  const highlighter = new Highlighter(options);
   const highlights = document.createElement('highlights');
-  if (className) {
-    highlights.setAttribute('class', className);
+  if (options.className) {
+    highlights.setAttribute('class', options.className);
   }
   document.body.appendChild(highlights);
 
   render(
     <Highlights
       highlighter={highlighter}
-      throttleUpdates={throttleUpdates}
-      onMouseEnterItem={showToken}
-      onMouseLeaveItem={hideToken}
+      throttleUpdates={options.throttleUpdates || 500}
+      onMouseEnterItem={options.showToken}
+      onMouseLeaveItem={options.hideToken}
+      ignoreMutations={[...options.ignoreMutations, highlights]}
     />,
     highlights
   );
