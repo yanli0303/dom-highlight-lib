@@ -2,6 +2,8 @@ import React from 'react';
 
 import { Token } from './Token';
 
+const UNDERLINE_OFFSET_BOTTOM = 1 as const;
+
 export const Highlight = ({
   token,
   rect,
@@ -21,7 +23,7 @@ export const Highlight = ({
       top: rect.top,
       left: rect.left,
       width: rect.width,
-      height: rect.height - 1,
+      height: rect.height - UNDERLINE_OFFSET_BOTTOM,
       borderBottom: `2px solid ${token.color}`,
       zIndex: 2147483647,
     }}
