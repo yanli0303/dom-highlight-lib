@@ -70,7 +70,7 @@ export const Highlights = ({
       mutationObserver = makeMutationObserver(
         highlighter,
         flush,
-        ignoreMutations
+        ignoreMutations,
       );
     }
 
@@ -95,7 +95,7 @@ export const Highlights = ({
             ref.ranges.filter(Boolean).map((range, rangeIndex) => {
               const token = (match.tokens || [])[rangeIndex];
               return Array.from(
-                range.getClientRects()
+                range.getClientRects(),
               ).map((rect, rectIndex) => (
                 <Highlight
                   key={[
@@ -111,8 +111,8 @@ export const Highlights = ({
                   onMouseLeave={onMouseLeaveItem}
                 />
               ));
-            })
-          )
+            }),
+          ),
         )
         .flat(4)}
     </>

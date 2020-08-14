@@ -47,7 +47,7 @@ interface StartOptions {
  * Initialize and start the highlighter.
  */
 export const start = (
-  options: StartOptions & HighlighterConfig & TextNodeSelector
+  options: StartOptions & HighlighterConfig & TextNodeSelector,
 ) => {
   const highlighter = new Highlighter(options);
   const highlights = document.createElement('highlights');
@@ -64,6 +64,6 @@ export const start = (
       onMouseLeaveItem={options.hideToken}
       ignoreMutations={[...options.ignoreMutations, highlights]}
     />,
-    highlights
+    highlights,
   );
 };

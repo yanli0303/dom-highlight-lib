@@ -15,7 +15,7 @@ const getNodes = (selectorOrRefs: (string | Node)[]): Node[] =>
 export const makeMutationObserver = (
   highlighter: Highlighter,
   done: () => void,
-  ignoreMutations: (string | Node)[] = []
+  ignoreMutations: (string | Node)[] = [],
 ) =>
   new MutationObserver((mutations: MutationRecord[]) => {
     const ignoreNodes = getNodes(ignoreMutations);
@@ -24,7 +24,7 @@ export const makeMutationObserver = (
       records = records.filter(
         ({ target }) =>
           target &&
-          !ignoreNodes.some(it => it === target || isDescendant(it, target))
+          !ignoreNodes.some(it => it === target || isDescendant(it, target)),
       );
     }
 
@@ -41,7 +41,7 @@ export const makeMutationObserver = (
     const changeRecords = records.filter(it => it.type === 'characterData');
     if (changeRecords.length > 0) {
       sequence = sequence.then(() =>
-        highlighter.updateNodes(changeRecords.map(it => it.target))
+        highlighter.updateNodes(changeRecords.map(it => it.target)),
       );
     }
 

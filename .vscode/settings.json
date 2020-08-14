@@ -9,6 +9,6 @@
   "importSorter.importStringConfiguration.trailingComma": "multiLine",
   "importSorter.sortConfiguration.removeUnusedImports": true,
   "importSorter.sortConfiguration.removeUnusedDefaultImports": false,
-  "importSorter.importStringConfiguration.maximumNumberOfImportExpressionsPerLine.count": 80,
-  "importSorter.importStringConfiguration.maximumNumberOfImportExpressionsPerLine.type": "maxLineLength",
+  "importSorter.importStringConfiguration.maximumNumberOfImportExpressionsPerLine.count": 1,
+  "importSorter.importStringConfiguration.maximumNumberOfImportExpressionsPerLine.type": "newLineEachExpressionAfterCountLimitExceptIfOnlyOne",
 }

@@ -24,7 +24,7 @@ export class Highlighter {
 
   detachRanges() {
     this.matches.forEach(m =>
-      m.nodeRefs.forEach(n => n.ranges.forEach(r => r.detach))
+      m.nodeRefs.forEach(n => n.ranges.forEach(r => r.detach)),
     );
   }
 
@@ -39,7 +39,7 @@ export class Highlighter {
     });
 
     const tokenGroups = await this.config.match(
-      nonEmptyMatches.map(m => m.nodeRefs[0].node.nodeValue || '')
+      nonEmptyMatches.map(m => m.nodeRefs[0].node.nodeValue || ''),
     );
     for (let i = 0; i < nonEmptyMatches.length; i += 1) {
       nonEmptyMatches[i].tokens = tokenGroups[i];
@@ -111,7 +111,7 @@ export class Highlighter {
         getDescendantTextNodes({
           root: node,
           ...this.config,
-        })
+        }),
       )
       .flat(2)
       .forEach(node => {
@@ -188,7 +188,7 @@ export class Highlighter {
       m.nodeRefs.forEach(ref => {
         ref.ranges.forEach(r => r.detach());
         ref.ranges = (m.tokens || []).map(t => makeRange(ref, t));
-      })
+      }),
     );
   }
 }

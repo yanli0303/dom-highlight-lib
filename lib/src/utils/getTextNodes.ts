@@ -43,7 +43,7 @@ export const getDescendantTextNodes = (filters: DescendantTextNodeFilter) => {
     filters.root,
     NodeFilter.SHOW_TEXT,
     null,
-    false
+    false,
   );
 
   const textNodes = [];
@@ -78,7 +78,7 @@ export const getTextNodes = ({
         ignoreInvisibleNodes,
         trimInvisibleChars,
         minTextLength,
-      })
+      }),
     )
     .flat(2);
 };
