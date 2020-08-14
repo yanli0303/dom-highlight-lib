@@ -1,5 +1,8 @@
 import throttle from 'lodash/throttle';
-import React, { useEffect, useState } from 'react';
+import React, {
+  useEffect,
+  useState,
+} from 'react';
 
 import { Highlight } from './Highlight';
 import { Highlighter } from './Highlighter';
@@ -81,7 +84,12 @@ export const Highlights = ({
     });
 
     scan({ type: 'page load' });
-  }, [highlighter, throttleUpdates, setCount, ignoreMutations]);
+  }, [
+    highlighter,
+    throttleUpdates,
+    setCount,
+    ignoreMutations,
+  ]);
 
   // eslint-disable-next-line no-console
   console.log(`Rendering highlights...#${count}`);

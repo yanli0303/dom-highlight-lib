@@ -2,13 +2,15 @@
 import stringHash from 'string-hash';
 
 import { HighlighterConfig } from './HighlighterConfig';
-import { Match, NodeRef } from './Match';
+import {
+  Match,
+  NodeRef,
+} from './Match';
 import { Token } from './Token';
 import {
   getDescendantTextNodes,
   getTextNodes,
   isDescendant,
-  testTextNode,
 } from './utils';
 
 export class Highlighter {
@@ -31,10 +33,10 @@ export class Highlighter {
   async setTokens(matches: Match[]) {
     const nonEmptyMatches: Match[] = [];
     matches.forEach(m => {
-      if (m.nodeRefs.length === 0) {
-        m.tokens = [];
-      } else {
+      if (m.nodeRefs.length) {
         nonEmptyMatches.push(m);
+      } else {
+        m.tokens = [];
       }
     });
 
@@ -107,12 +109,7 @@ export class Highlighter {
   addNodes(rootNodes: Node[]): Promise<void> {
     let numberOfNewNodes = 0;
     rootNodes
-      .map(node =>
-        getDescendantTextNodes({
-          root: node,
-          ...this.config,
-        }),
-      )
+      .map(node => getDescendantTextNodes({ root: node, ...this.config }))
       .flat(2)
       .forEach(node => {
         const nodeValueHash = stringHash(node.nodeValue || '');
@@ -142,16 +139,13 @@ export class Highlighter {
     const removedMatchKeys: number[] = [];
     this.matches.forEach((match, key) => {
       match.nodeRefs = match.nodeRefs.filter(ref => {
-        if (
-          testTextNode(ref.node, this.config) &&
-          !rootNodes.some(r => r === ref.node || isDescendant(r, ref.node))
-        ) {
-          return true;
+        if (rootNodes.some(r => r === ref.node || isDescendant(r, ref.node))) {
+          numberOfRemovedNodes += 1;
+          ref.ranges.forEach(r => r.detach());
+          return false;
         }
 
-        numberOfRemovedNodes += 1;
-        ref.ranges.forEach(r => r.detach());
-        return false;
+        return true;
       });
 
       if (match.nodeRefs.length === 0) {
