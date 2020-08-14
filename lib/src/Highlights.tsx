@@ -36,7 +36,7 @@ let mutationObserver: MutationObserver | null = null;
 
 const deleteEventListeners = () => {
   if (UPDATE_HANDLER) {
-    document.removeEventListener(SCROLL, UPDATE_HANDLER);
+    window.removeEventListener(SCROLL, UPDATE_HANDLER);
     window.removeEventListener(RESIZE, UPDATE_HANDLER);
     UPDATE_HANDLER = null;
     mutationObserver?.disconnect();
@@ -56,14 +56,14 @@ export const Highlights = ({
     deleteEventListeners();
     const flush = () => setCount(v => v + 1);
 
-    const scan = (e: any) => {
-      console.log(`${typeof e === 'object' && e.type ? e.type : e}, scanning`);
+    const scan = (e: { type: string }) => {
+      console.log(`Scan triggered by ${e.type}`);
       highlighter.scan().then(flush);
     };
     const uu = throttle(scan, throttleUpdates);
 
-    document.addEventListener('scroll', uu);
-    window.addEventListener('resize', uu);
+    window.addEventListener(SCROLL, uu);
+    window.addEventListener(RESIZE, uu);
     UPDATE_HANDLER = uu;
 
     if (!mutationObserver) {
@@ -80,7 +80,7 @@ export const Highlights = ({
       subtree: true,
     });
 
-    scan('page load');
+    scan({ type: 'page load' });
   }, [highlighter, throttleUpdates, setCount, ignoreMutations]);
 
   // eslint-disable-next-line no-console

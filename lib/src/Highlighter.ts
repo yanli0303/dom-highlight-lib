@@ -4,9 +4,11 @@ import stringHash from 'string-hash';
 import { HighlighterConfig } from './HighlighterConfig';
 import { Match, NodeRef } from './Match';
 import { Token } from './Token';
-// prettier-ignore
 import {
-  getDescendantTextNodes, getTextNodes, isDescendant, testTextNode,
+  getDescendantTextNodes,
+  getTextNodes,
+  isDescendant,
+  testTextNode,
 } from './utils';
 
 export class Highlighter {

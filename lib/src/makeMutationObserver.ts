@@ -23,6 +23,7 @@ export const makeMutationObserver = (
     if (ignoreNodes) {
       records = records.filter(
         ({ target }) =>
+          target &&
           !ignoreNodes.some(it => it === target || isDescendant(it, target))
       );
     }
